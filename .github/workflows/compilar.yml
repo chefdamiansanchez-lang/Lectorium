@@ -1,0 +1,37 @@
+name: Compilar APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Descomprimir el proyecto
+        run: unzip -o LectorVoz.zip -d .
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Compilar APK
+        working-directory: ./LectorVoz
+        run: gradle assembleDebug
+
+      - name: Subir el APK compilado
+        uses: actions/upload-artifact@v4
+        with:
+          name: LectorVoz-apk
+          path: LectorVoz/app/build/outputs/apk/debug/app-debug.apk
